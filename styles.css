@@ -1,65 +1,74 @@
-/* Position copy icon in the top-right of each tweet */
+/* Put the copy icon inline inside the action icon group so native icons follow it */
 .x-copy-btn-wrapper {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  z-index: 20;
-  opacity: 0; /* hidden by default */
-  transition: opacity .2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;            /* space between copy icon and native icons */
+  opacity: 0.75;               /* slightly translucent by default */
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  user-select: none;
+  pointer-events: auto;        /* must be clickable */
 }
 
 /* Show only when tweet is hovered */
-article:hover .x-copy-btn-wrapper {
+/* when tweet or action group hovered, make it more visible */
+article:hover .x-copy-btn-wrapper,
+  .x-action-group:hover .x-copy-btn-wrapper {
   opacity: 1;
+  transform: translateY(-1px);
 }
 
-/* Icon-only button using X styling */
+/* Button style (round, translucent, small) */
 .x-copy-btn {
   cursor: pointer;
   padding: 6px;
   border-radius: 9999px; /* fully round */
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  
+  border: 1px solid rgba(255,255,255,0.12);
+
   /* X translucent UI style */
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.06);
   backdrop-filter: blur(6px);
 
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  width: 28px;
-  height: 28px;
-
-  transition: background .2s, transform .2s, opacity .2s;
+  width: 32px;
+  height: 32px;
 }
 
-/* On hover: brighten */
+/* Hover effect for the button itself (subtle) */
 .x-copy-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
+  background: rgba(255, 165, 0, 0.25);   /* orange translucent */
+  border-color: rgba(255, 165, 0, 0.45); /* subtle orange border */
+  transform: scale(1.12);
 }
 
-/* The SVG icon */
+/* SVG icon sizing & color */
 .x-copy-btn svg {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   fill: var(--twitter-text-color, #fff);
 }
 
-/* Copied animation (fade-in fade-out) */
+.x-copy-btn:hover svg {
+  fill: #FFA500; /* bright orange icon */
+}
+
+/* Toast (Copied!) - keep as a small overlay near the action bar if inserted there */
 .x-copy-toast {
   position: absolute;
-  top: 40px;
-  right: 10px;
-  background: rgba(29,155,240,0.9); /* X blue */
-  color: white;
+  top: -36px;
+  right: 0;
+  background: rgba(29,155,240,0.95);
+  color: #fff;
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 12px;
   opacity: 0;
+  transition: opacity .18s ease;
   pointer-events: none;
-  transition: opacity .25s ease-out;
+  transform-origin: right top;
 }
 
 .x-copy-toast.show {
