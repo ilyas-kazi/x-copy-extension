@@ -97,10 +97,10 @@ Safari requires Xcode.
 
 # How It Works
 
-### ✔ Detects real tweets  
+### ➣ Detects real tweets  
 Only `<article>` elements containing tweet text are modified.
 
-### ✔ Skips notifications  
+### ➣ Skips notifications  
 No button appears for:
 - Likes  
 - Replies  
@@ -109,10 +109,10 @@ No button appears for:
 - Suggestions  
 - System notifications  
 
-### ✔ Injects copy button into action bar  
+### ➣ Injects copy button into action bar  
 Button becomes the *first icon*, maintaining native UX.
 
-### ✔ Click → Copies text + shows toast  
+### ➣ Click → Copies text + shows toast  
 Works via:
 - `navigator.clipboard.writeText`
 - Safari/Firefox fallback using `execCommand("copy")`
