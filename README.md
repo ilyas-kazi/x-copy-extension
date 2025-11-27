@@ -1,4 +1,4 @@
-# X Copy Tweet – Cross-Browser Extension
+# X Copy Tweet - Cross-Browser Extension
 
 A lightweight browser extension that adds a clean **Copy Tweet** button to every real tweet on **X.com** (formerly Twitter).  
 It works across **Chrome, Edge, Brave, Opera, Vivaldi, Firefox, and Safari** using a unified `/src` codebase with platform-specific build folders.
