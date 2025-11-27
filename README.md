@@ -5,6 +5,12 @@ It works across **Chrome, Edge, Brave, Opera, Vivaldi, Firefox, and Safari** usi
 
 ---
 
+## Screenshot
+
+![Screenshot](screenshot.png)
+
+---
+
 # Project Structure (Cross-Browser)
 
 ```
