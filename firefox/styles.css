@@ -23,11 +23,8 @@ article:hover .x-copy-btn-wrapper,
   cursor: pointer;
   padding: 6px;
   border-radius: 9999px; /* fully round */
-  border: 1px solid rgba(255,255,255,0.12);
-
-  /* X translucent UI style */
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(6px);
+  border: none;
+  background: transparent;
 
   display: inline-flex;
   align-items: center;
@@ -40,7 +37,7 @@ article:hover .x-copy-btn-wrapper,
 /* Hover effect for the button itself (subtle) */
 .x-copy-btn:hover {
   background: rgba(255, 165, 0, 0.25);   /* orange translucent */
-  border-color: rgba(255, 165, 0, 0.45); /* subtle orange border */
+  border: 1px solid rgba(255, 165, 0, 0.45); /* circular orange border on hover */
   transform: scale(1.12);
 }
 
