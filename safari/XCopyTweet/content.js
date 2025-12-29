@@ -8,6 +8,18 @@ function debugLog(...args) {
     if (DEBUG) console.log("X-COPY:", ...args);
 }
 
+// Helper: extract username from tweet
+function extractUsername(tweetEl) {
+    // Try to find username in tweet
+    const userLink = tweetEl.querySelector("a[href^='/'][role='link']");
+    if (userLink) {
+        const href = userLink.getAttribute('href');
+        const match = href.match(/^\/([^\/]+)/);
+        if (match) return '@' + match[1];
+    }
+    return null;
+}
+
 // Helper: get tweet text reliably (tries multiple selectors)
 function extractTweetText(tweetEl) {
     // Prefer explicit tweet text testid
@@ -86,18 +98,26 @@ function addCopyButtons() {
       </svg>
     `;
 
-        // click handler
-        btn.addEventListener("click", async (e) => {
-            e.stopPropagation(); // avoid triggering tweet click
-            e.preventDefault();
+        // Create menu (will be appended to body for proper z-index)
+        const menu = document.createElement("div");
+        menu.className = "x-copy-menu";
+        menu.style.display = "none";
+        menu.style.position = "fixed";  // Use fixed positioning
 
-            // get tweet text
+        // Menu item 1: Copy tweet
+        const menuItem1 = document.createElement("div");
+        menuItem1.className = "x-copy-menu-item";
+        menuItem1.textContent = "Copy tweet";
+        menuItem1.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            
             const textNode = article.querySelector("[data-testid='tweetText'], div[lang]");
             const text = textNode?.innerText?.trim() ?? "";
 
             if (!text) {
-                // optional feedback for empty
                 showToast(article, "No text");
+                closeMenu(menu);
                 return;
             }
 
@@ -105,14 +125,68 @@ function addCopyButtons() {
                 await navigator.clipboard.writeText(text);
                 showToast(article, "Copied!");
             } catch (err) {
-                // fallback copy via textarea
-                const ta = document.createElement("textarea");
-                ta.value = text;
-                document.body.appendChild(ta);
-                ta.select();
-                try { document.execCommand("copy"); showToast(article, "Copied!"); }
-                catch (e) { showToast(article, "Copy failed"); }
-                ta.remove();
+                fallbackCopy(text, article);
+            }
+            closeMenu(menu);
+        });
+
+        // Menu item 2: Copy tweet + Username
+        const menuItem2 = document.createElement("div");
+        menuItem2.className = "x-copy-menu-item";
+        menuItem2.textContent = "Copy tweet + Username";
+        menuItem2.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const textNode = article.querySelector("[data-testid='tweetText'], div[lang]");
+            const text = textNode?.innerText?.trim() ?? "";
+            const username = extractUsername(article);
+
+            if (!text) {
+                showToast(article, "No text");
+                closeMenu(menu);
+                return;
+            }
+
+            const fullText = username ? `${username}\n${text}` : text;
+
+            try {
+                await navigator.clipboard.writeText(fullText);
+                showToast(article, "Copied with username!");
+            } catch (err) {
+                fallbackCopy(fullText, article);
+            }
+            closeMenu(menu);
+        });
+
+        menu.appendChild(menuItem1);
+        menu.appendChild(menuItem2);
+        
+        // Append menu to body instead of wrapper to avoid z-index issues
+        document.body.appendChild(menu);
+        
+        // Store reference to menu in button for cleanup
+        btn._xcopyMenu = menu;
+
+        // Click handler to toggle menu
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // Close other open menus
+            document.querySelectorAll(".x-copy-menu").forEach(m => {
+                if (m !== menu) m.style.display = "none";
+            });
+
+            // Toggle this menu
+            if (menu.style.display === "none" || !menu.style.display) {
+                // Calculate position relative to button
+                const rect = btn.getBoundingClientRect();
+                menu.style.left = rect.left + "px";
+                menu.style.top = (rect.bottom + 4) + "px";  // 4px below button
+                menu.style.display = "block";
+            } else {
+                menu.style.display = "none";
             }
         });
 
@@ -151,6 +225,26 @@ function addCopyButtons() {
     });
 }
 
+// Helper: close menu
+function closeMenu(menu) {
+    menu.style.display = "none";
+}
+
+// Helper: fallback copy method
+function fallbackCopy(text, article) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        document.execCommand("copy");
+        showToast(article, "Copied!");
+    } catch (e) {
+        showToast(article, "Copy failed");
+    }
+    ta.remove();
+}
+
 // helper: show small toast near action group or at top-right of article
 function showToast(article, message) {
     const existing = article.querySelector(".x-copy-toast");
@@ -185,6 +279,15 @@ function showToast(article, message) {
     }, 900);
 }
 
+
+// Close menu when clicking outside
+document.addEventListener("click", (e) => {
+    if (!e.target.closest(".x-copy-btn-wrapper")) {
+        document.querySelectorAll(".x-copy-menu").forEach(menu => {
+            menu.style.display = "none";
+        });
+    }
+});
 
 // Observe DOM changes (infinite scroll)
 const observer = new MutationObserver((mutations) => {
