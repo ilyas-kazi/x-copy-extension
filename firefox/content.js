@@ -20,6 +20,35 @@ function extractUsername(tweetEl) {
     return null;
 }
 
+// Helper: extract display name from tweet
+function extractDisplayName(tweetEl) {
+    // Try multiple approaches to find the display name
+    
+    // Approach 1: Look in the User-Name test ID area
+    const userNameSection = tweetEl.querySelector('[data-testid="User-Name"]');
+    if (userNameSection) {
+        // Find all spans and get the first one that's not a username (doesn't start with @)
+        const spans = userNameSection.querySelectorAll('span');
+        for (const span of spans) {
+            const text = span.textContent?.trim();
+            if (text && !text.startsWith('@') && !text.includes('·') && text.length > 0) {
+                return text;
+            }
+        }
+    }
+    
+    // Approach 2: Look for a div/span with specific styling (usually bold)
+    const boldSpans = tweetEl.querySelectorAll('div[dir="ltr"] > span');
+    for (const span of boldSpans) {
+        const text = span.textContent?.trim();
+        if (text && !text.startsWith('@') && !text.includes('http') && text.length > 0 && text.length < 50) {
+            return text;
+        }
+    }
+    
+    return null;
+}
+
 // Helper: clean up text by fixing URLs and mentions that have line breaks
 function cleanText(text) {
     return text
@@ -161,6 +190,7 @@ function addCopyButtons() {
             const textNode = article.querySelector("[data-testid='tweetText'], div[lang]");
             const text = cleanText(textNode?.innerText?.trim() ?? "");
             const username = extractUsername(article);
+            const displayName = extractDisplayName(article);
 
             if (!text) {
                 showToast(article, "No text");
@@ -168,7 +198,15 @@ function addCopyButtons() {
                 return;
             }
 
-            const fullText = username ? `${username}\n${text}` : text;
+            // Format: Display Name (@username) or just @username if display name not found
+            let header = '';
+            if (displayName && username) {
+                header = `${displayName} (${username})`;
+            } else if (username) {
+                header = username;
+            }
+            
+            const fullText = header ? `${header}\n${text}` : text;
 
             try {
                 await navigator.clipboard.writeText(fullText);
