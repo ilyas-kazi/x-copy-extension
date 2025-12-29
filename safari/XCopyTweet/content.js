@@ -20,6 +20,26 @@ function extractUsername(tweetEl) {
     return null;
 }
 
+// Helper: clean up text by fixing URLs and mentions that have line breaks
+function cleanText(text) {
+    return text
+        // Remove line breaks WITHIN URLs (after protocol)
+        .replace(/(https?:\/\/)\s*\n\s*/g, '$1')
+        // Remove line breaks before and after @mentions
+        .replace(/\s*\n\s*(@\w+)/g, ' $1')
+        .replace(/(@\w+)\s*\n\s*/g, '$1 ')
+        // Remove line breaks before URLs
+        .replace(/\s*\n\s*(https?:\/\/)/g, ' $1')
+        // Remove line breaks after URLs (before next word)
+        .replace(/(https?:\/\/\S+)\s+/g, '$1 ')
+        // Fix space before punctuation (e.g., "word ." -> "word.")
+        .replace(/\s+([.,!?;:])/g, '$1')
+        // Clean up multiple spaces
+        .replace(/  +/g, ' ')
+        // Trim
+        .trim();
+}
+
 // Helper: get tweet text reliably (tries multiple selectors)
 function extractTweetText(tweetEl) {
     // Prefer explicit tweet text testid
@@ -113,7 +133,7 @@ function addCopyButtons() {
             e.preventDefault();
             
             const textNode = article.querySelector("[data-testid='tweetText'], div[lang]");
-            const text = textNode?.innerText?.trim() ?? "";
+            const text = cleanText(textNode?.innerText?.trim() ?? "");
 
             if (!text) {
                 showToast(article, "No text");
@@ -139,7 +159,7 @@ function addCopyButtons() {
             e.preventDefault();
             
             const textNode = article.querySelector("[data-testid='tweetText'], div[lang]");
-            const text = textNode?.innerText?.trim() ?? "";
+            const text = cleanText(textNode?.innerText?.trim() ?? "");
             const username = extractUsername(article);
 
             if (!text) {
