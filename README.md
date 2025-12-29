@@ -150,8 +150,9 @@ Copy them into:
 
 # Future Enhancements
 
+- ~~Implement menu on click for more options~~
 - Copy full thread  
-- Copy tweet + username  
+- ~~Copy tweet + username~~
 - Options page  
 - Publish to Chrome Web Store  
 - Firefox `.xpi` packaging  
