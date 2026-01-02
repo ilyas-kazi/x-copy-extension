@@ -44,15 +44,22 @@ article:hover .x-copy-btn-wrapper,
   transform: scale(1.12);
 }
 
-/* SVG icon sizing & color */
+/* SVG icon sizing & color - adapts to light/dark mode */
 .x-copy-btn svg {
   width: 14px;
   height: 14px;
-  fill: var(--twitter-text-color, #fff);
+  fill: rgb(83, 100, 113); /* default gray that works in both modes */
+}
+
+/* Dark mode icon color */
+[data-theme="dark"] .x-copy-btn svg,
+html[style*="color-scheme: dark"] .x-copy-btn svg,
+body[style*="background-color: rgb(0, 0, 0)"] .x-copy-btn svg {
+  fill: rgb(113, 118, 123);
 }
 
 .x-copy-btn:hover svg {
-  fill: #FFA500; /* bright orange icon */
+  fill: #FFA500; /* bright orange icon on hover */
 }
 
 /* Menu dropdown - using fixed positioning to avoid z-index stacking issues */
@@ -104,4 +111,35 @@ article:hover .x-copy-btn-wrapper,
 
 .x-copy-toast.show {
   opacity: 1;
+}
+
+/* Tooltip - matching X.com native style */
+.x-copy-tooltip {
+  position: fixed;
+  background: rgb(97, 97, 97); /* Light mode: gray background */
+  color: rgb(255, 255, 255);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10002;
+  opacity: 0;
+  transform: translateX(-50%) scale(0.8);
+  transform-origin: top center;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Dark mode tooltip - sky blue like X.com */
+[data-theme="dark"] .x-copy-tooltip,
+html[style*="color-scheme: dark"] .x-copy-tooltip,
+body[style*="background-color: rgb(0, 0, 0)"] .x-copy-tooltip {
+  background: rgb(29, 155, 240); /* X.com's sky blue */
+  color: rgb(255, 255, 255);
+}
+
+.x-copy-tooltip.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
 }

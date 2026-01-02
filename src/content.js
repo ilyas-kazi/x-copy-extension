@@ -147,6 +147,31 @@ function addCopyButtons() {
       </svg>
     `;
 
+        // Create tooltip element
+        const tooltip = document.createElement("div");
+        tooltip.className = "x-copy-tooltip";
+        tooltip.textContent = "Copy Tweet";
+        document.body.appendChild(tooltip);
+
+        // Store reference to tooltip in button for cleanup
+        btn._xcopyTooltip = tooltip;
+
+        // Tooltip hover handlers
+        let tooltipTimeout;
+        btn.addEventListener("mouseenter", () => {
+            tooltipTimeout = setTimeout(() => {
+                const rect = btn.getBoundingClientRect();
+                tooltip.style.left = (rect.left + rect.width / 2) + "px";
+                tooltip.style.top = (rect.bottom + 4) + "px";
+                tooltip.classList.add("show");
+            }, 300); // 300ms delay
+        });
+
+        btn.addEventListener("mouseleave", () => {
+            clearTimeout(tooltipTimeout);
+            tooltip.classList.remove("show");
+        });
+
         // Create menu (will be appended to body for proper z-index)
         const menu = document.createElement("div");
         menu.className = "x-copy-menu";
@@ -230,6 +255,10 @@ function addCopyButtons() {
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
             e.preventDefault();
+
+            // Hide tooltip when menu opens
+            tooltip.classList.remove("show");
+            clearTimeout(tooltipTimeout);
 
             // Close other open menus
             document.querySelectorAll(".x-copy-menu").forEach(m => {
@@ -338,11 +367,14 @@ function showToast(article, message) {
 }
 
 
-// Close menu when clicking outside
+// Close menu and tooltips when clicking outside
 document.addEventListener("click", (e) => {
     if (!e.target.closest(".x-copy-btn-wrapper")) {
         document.querySelectorAll(".x-copy-menu").forEach(menu => {
             menu.style.display = "none";
+        });
+        document.querySelectorAll(".x-copy-tooltip").forEach(tooltip => {
+            tooltip.classList.remove("show");
         });
     }
 });
